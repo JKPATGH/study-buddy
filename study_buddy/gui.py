@@ -11,6 +11,20 @@ from study_buddy.extractor import extract_text
 from study_buddy.gpa import WEIGHT_BONUS, class_gpa, overall_gpa
 from study_buddy.quiz_generator import generate_quiz
 from study_buddy.storage import load_data, save_data
+from study_buddy.theme import (
+    ACCENT,
+    BG,
+    BORDER,
+    CARD_BG,
+    FONT_BODY,
+    FONT_HEADING,
+    FONT_SUBTITLE,
+    FONT_TITLE,
+    MUTED,
+    TEXT,
+    apply_theme,
+    style_treeview_stripes,
+)
 
 APP_TITLE = "Study Buddy"
 
@@ -19,13 +33,22 @@ class StudyBuddyApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(APP_TITLE)
-        self.geometry("720x560")
-        self.minsize(620, 480)
+        self.geometry("760x600")
+        self.minsize(660, 500)
 
+        apply_theme(self)
         self.data = load_data()
 
+        header = tk.Frame(self, bg=BG)
+        header.pack(fill="x", padx=24, pady=(20, 8))
+        tk.Label(header, text="🎓 Study Buddy", font=FONT_TITLE, bg=BG, fg=TEXT).pack(anchor="w")
+        tk.Label(
+            header, text="Quiz yourself, track your schedule, and plan your future.",
+            font=FONT_SUBTITLE, bg=BG, fg=MUTED,
+        ).pack(anchor="w", pady=(2, 0))
+
         notebook = ttk.Notebook(self)
-        notebook.pack(fill="both", expand=True)
+        notebook.pack(fill="both", expand=True, padx=16, pady=(4, 16))
 
         self.quiz_tab = QuizTab(notebook)
         self.calendar_tab = CalendarTab(notebook, self.data, self._save)
@@ -33,11 +56,11 @@ class StudyBuddyApp(tk.Tk):
         self.gpa_tab = GpaTab(notebook, self.data, self._save)
         self.planner_tab = PlannerTab(notebook, self.data, self._save)
 
-        notebook.add(self.quiz_tab, text="Quiz")
-        notebook.add(self.calendar_tab, text="Calendar")
-        notebook.add(self.periods_tab, text="Class Periods")
-        notebook.add(self.gpa_tab, text="GPA Calculator")
-        notebook.add(self.planner_tab, text="Planner")
+        notebook.add(self.quiz_tab, text="🧠  Quiz")
+        notebook.add(self.calendar_tab, text="📅  Calendar")
+        notebook.add(self.periods_tab, text="🕒  Class Periods")
+        notebook.add(self.gpa_tab, text="📊  GPA Calculator")
+        notebook.add(self.planner_tab, text="🗺️  Planner")
 
     def _save(self):
         save_data(self.data)
@@ -45,7 +68,7 @@ class StudyBuddyApp(tk.Tk):
 
 class QuizTab(ttk.Frame):
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, style="TFrame")
         self.questions = []
         self.current_index = 0
         self.score = 0
@@ -58,14 +81,15 @@ class QuizTab(ttk.Frame):
 
     def _build_start_screen(self):
         self._clear()
-        tk.Label(self, text="Quiz Yourself", font=("Helvetica", 20, "bold")).pack(pady=(40, 10))
+        wrapper = tk.Frame(self, bg=BG)
+        wrapper.pack(expand=True)
+        tk.Label(wrapper, text="📄", font=("Helvetica", 40), bg=BG).pack(pady=(40, 10))
+        tk.Label(wrapper, text="Quiz Yourself", font=FONT_TITLE, bg=BG, fg=TEXT).pack()
         tk.Label(
-            self,
-            text="Upload a PDF, image, or text file to generate a quiz.",
-            font=("Helvetica", 13),
-            wraplength=440,
-        ).pack(pady=(0, 30))
-        tk.Button(self, text="Choose File...", font=("Helvetica", 13), command=self._choose_file, width=20).pack(pady=10)
+            wrapper, text="Upload a PDF, image, or text file to generate a quiz.",
+            font=FONT_SUBTITLE, bg=BG, fg=MUTED, wraplength=440,
+        ).pack(pady=(6, 24))
+        ttk.Button(wrapper, text="Choose File...", style="Accent.TButton", command=self._choose_file).pack()
 
     def _choose_file(self):
         file_path = filedialog.askopenfilename(
@@ -96,12 +120,26 @@ class QuizTab(ttk.Frame):
     def _build_question_screen(self):
         self._clear()
         q = self.questions[self.current_index]
-        tk.Label(self, text=f"Question {self.current_index + 1} of {len(self.questions)}", font=("Helvetica", 12, "bold")).pack(pady=(24, 4))
-        tk.Label(self, text=q.prompt, font=("Helvetica", 14), wraplength=560, justify="left").pack(pady=(0, 20), padx=20)
+
+        card = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
+        card.pack(fill="both", expand=True, padx=40, pady=30)
+
+        tk.Label(
+            card, text=f"QUESTION {self.current_index + 1} OF {len(self.questions)}",
+            font=("Helvetica", 11, "bold"), bg=CARD_BG, fg=ACCENT,
+        ).pack(pady=(28, 6), padx=30, anchor="w")
+        tk.Label(card, text=q.prompt, font=FONT_HEADING, bg=CARD_BG, fg=TEXT, wraplength=560, justify="left").pack(
+            pady=(0, 20), padx=30, anchor="w"
+        )
+
         self.selected_choice.set("")
         for choice in q.choices:
-            tk.Radiobutton(self, text=choice, variable=self.selected_choice, value=choice, font=("Helvetica", 13)).pack(anchor="w", padx=60, pady=4)
-        tk.Button(self, text="Submit", font=("Helvetica", 13), command=self._submit_answer, width=16).pack(pady=24)
+            tk.Radiobutton(
+                card, text=choice, variable=self.selected_choice, value=choice, font=FONT_BODY,
+                bg=CARD_BG, fg=TEXT, selectcolor=CARD_BG, activebackground=CARD_BG, anchor="w",
+            ).pack(anchor="w", padx=50, pady=4, fill="x")
+
+        ttk.Button(card, text="Submit", style="Accent.TButton", command=self._submit_answer).pack(pady=26)
 
     def _submit_answer(self):
         choice = self.selected_choice.get()
@@ -119,38 +157,49 @@ class QuizTab(ttk.Frame):
 
     def _build_results_screen(self):
         self._clear()
-        tk.Label(self, text="Quiz Complete!", font=("Helvetica", 22, "bold")).pack(pady=(50, 10))
-        tk.Label(self, text=f"Score: {self.score}/{len(self.questions)}", font=("Helvetica", 16)).pack(pady=(0, 30))
-        tk.Button(self, text="Try Another File", font=("Helvetica", 13), command=self._build_start_screen, width=20).pack()
+        wrapper = tk.Frame(self, bg=BG)
+        wrapper.pack(expand=True)
+        tk.Label(wrapper, text="🏁", font=("Helvetica", 40), bg=BG).pack(pady=(50, 10))
+        tk.Label(wrapper, text="Quiz Complete!", font=FONT_TITLE, bg=BG, fg=TEXT).pack()
+        tk.Label(
+            wrapper, text=f"Score: {self.score}/{len(self.questions)}",
+            font=("Helvetica", 16, "bold"), bg=BG, fg=ACCENT,
+        ).pack(pady=(8, 26))
+        ttk.Button(wrapper, text="Try Another File", style="Accent.TButton", command=self._build_start_screen).pack()
 
 
 class CalendarTab(ttk.Frame):
     def __init__(self, parent, data, save_callback):
-        super().__init__(parent)
+        super().__init__(parent, style="TFrame")
         self.data = data
         self.save_callback = save_callback
 
-        form = ttk.Frame(self)
+        form = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
         form.pack(fill="x", padx=16, pady=16)
+        inner = tk.Frame(form, bg=CARD_BG)
+        inner.pack(fill="x", padx=16, pady=14)
 
-        ttk.Label(form, text="Date (YYYY-MM-DD):").grid(row=0, column=0, sticky="w")
-        self.date_entry = ttk.Entry(form, width=16)
-        self.date_entry.grid(row=0, column=1, padx=(6, 20))
+        tk.Label(inner, text="Date (YYYY-MM-DD)", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=0, sticky="w")
+        self.date_entry = ttk.Entry(inner, width=16)
+        self.date_entry.grid(row=1, column=0, padx=(0, 20), sticky="w")
 
-        ttk.Label(form, text="Event / Deadline:").grid(row=0, column=2, sticky="w")
-        self.title_entry = ttk.Entry(form, width=32)
-        self.title_entry.grid(row=0, column=3, padx=(6, 20))
+        tk.Label(inner, text="Event / Deadline", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=1, sticky="w")
+        self.title_entry = ttk.Entry(inner, width=36)
+        self.title_entry.grid(row=1, column=1, padx=(0, 20), sticky="w")
 
-        ttk.Button(form, text="Add", command=self._add_event).grid(row=0, column=4)
+        ttk.Button(inner, text="Add", style="Accent.TButton", command=self._add_event).grid(row=1, column=2)
 
-        self.tree = ttk.Treeview(self, columns=("date", "title"), show="headings", height=14)
+        table_wrap = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
+        table_wrap.pack(fill="both", expand=True, padx=16)
+        self.tree = ttk.Treeview(table_wrap, columns=("date", "title"), show="headings", height=14)
         self.tree.heading("date", text="Date")
         self.tree.heading("title", text="Event / Deadline")
         self.tree.column("date", width=120, anchor="center")
         self.tree.column("title", width=440)
-        self.tree.pack(fill="both", expand=True, padx=16)
+        self.tree.pack(fill="both", expand=True, padx=1, pady=1)
+        style_treeview_stripes(self.tree)
 
-        ttk.Button(self, text="Remove Selected", command=self._remove_selected).pack(pady=10)
+        ttk.Button(self, text="Remove Selected", style="Secondary.TButton", command=self._remove_selected).pack(pady=12)
 
         self._refresh()
 
@@ -176,44 +225,43 @@ class CalendarTab(ttk.Frame):
 
     def _refresh(self):
         self.tree.delete(*self.tree.get_children())
-        for event in self.data["calendar"]:
-            self.tree.insert("", "end", values=(event["date"], event["title"]))
+        for i, event in enumerate(self.data["calendar"]):
+            self.tree.insert("", "end", values=(event["date"], event["title"]), tags=("odd" if i % 2 else "even",))
 
 
 class PeriodsTab(ttk.Frame):
     def __init__(self, parent, data, save_callback):
-        super().__init__(parent)
+        super().__init__(parent, style="TFrame")
         self.data = data
         self.save_callback = save_callback
 
-        form = ttk.Frame(self)
+        form = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
         form.pack(fill="x", padx=16, pady=16)
+        inner = tk.Frame(form, bg=CARD_BG)
+        inner.pack(fill="x", padx=16, pady=14)
 
-        ttk.Label(form, text="Period:").grid(row=0, column=0, sticky="w")
-        self.period_entry = ttk.Entry(form, width=8)
-        self.period_entry.grid(row=0, column=1, padx=(6, 20))
+        labels = ["Period", "Class", "Teacher", "Time"]
+        widths = [8, 20, 16, 14]
+        self.entries = []
+        for col, (label, width) in enumerate(zip(labels, widths)):
+            tk.Label(inner, text=label, font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=col, sticky="w", padx=(0, 16))
+            entry = ttk.Entry(inner, width=width)
+            entry.grid(row=1, column=col, padx=(0, 16), sticky="w")
+            self.entries.append(entry)
+        self.period_entry, self.class_entry, self.teacher_entry, self.time_entry = self.entries
 
-        ttk.Label(form, text="Class:").grid(row=0, column=2, sticky="w")
-        self.class_entry = ttk.Entry(form, width=20)
-        self.class_entry.grid(row=0, column=3, padx=(6, 20))
+        ttk.Button(inner, text="Add", style="Accent.TButton", command=self._add_period).grid(row=1, column=4)
 
-        ttk.Label(form, text="Teacher:").grid(row=0, column=4, sticky="w")
-        self.teacher_entry = ttk.Entry(form, width=16)
-        self.teacher_entry.grid(row=0, column=5, padx=(6, 20))
-
-        ttk.Label(form, text="Time:").grid(row=0, column=6, sticky="w")
-        self.time_entry = ttk.Entry(form, width=14)
-        self.time_entry.grid(row=0, column=7, padx=(6, 20))
-
-        ttk.Button(form, text="Add", command=self._add_period).grid(row=0, column=8)
-
-        self.tree = ttk.Treeview(self, columns=("period", "class_name", "teacher", "time"), show="headings", height=14)
+        table_wrap = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
+        table_wrap.pack(fill="both", expand=True, padx=16)
+        self.tree = ttk.Treeview(table_wrap, columns=("period", "class_name", "teacher", "time"), show="headings", height=14)
         for col, label, width in [("period", "Period", 70), ("class_name", "Class", 220), ("teacher", "Teacher", 160), ("time", "Time", 140)]:
             self.tree.heading(col, text=label)
             self.tree.column(col, width=width, anchor="center" if col == "period" else "w")
-        self.tree.pack(fill="both", expand=True, padx=16)
+        self.tree.pack(fill="both", expand=True, padx=1, pady=1)
+        style_treeview_stripes(self.tree)
 
-        ttk.Button(self, text="Remove Selected", command=self._remove_selected).pack(pady=10)
+        ttk.Button(self, text="Remove Selected", style="Secondary.TButton", command=self._remove_selected).pack(pady=12)
 
         self._refresh()
 
@@ -231,7 +279,7 @@ class PeriodsTab(ttk.Frame):
         })
         self.data["periods"].sort(key=lambda p: p["period"])
         self.save_callback()
-        for entry in (self.period_entry, self.class_entry, self.teacher_entry, self.time_entry):
+        for entry in self.entries:
             entry.delete(0, tk.END)
         self._refresh()
 
@@ -244,43 +292,50 @@ class PeriodsTab(ttk.Frame):
 
     def _refresh(self):
         self.tree.delete(*self.tree.get_children())
-        for p in self.data["periods"]:
-            self.tree.insert("", "end", values=(p["period"], p["class_name"], p["teacher"], p["time"]))
+        for i, p in enumerate(self.data["periods"]):
+            self.tree.insert("", "end", values=(p["period"], p["class_name"], p["teacher"], p["time"]), tags=("odd" if i % 2 else "even",))
 
 
 class GpaTab(ttk.Frame):
     def __init__(self, parent, data, save_callback):
-        super().__init__(parent)
+        super().__init__(parent, style="TFrame")
         self.data = data
         self.save_callback = save_callback
 
-        form = ttk.Frame(self)
+        form = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
         form.pack(fill="x", padx=16, pady=16)
+        inner = tk.Frame(form, bg=CARD_BG)
+        inner.pack(fill="x", padx=16, pady=14)
 
-        ttk.Label(form, text="Class:").grid(row=0, column=0, sticky="w")
-        self.class_entry = ttk.Entry(form, width=20)
-        self.class_entry.grid(row=0, column=1, padx=(6, 20))
+        tk.Label(inner, text="Class", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=0, sticky="w", padx=(0, 16))
+        self.class_entry = ttk.Entry(inner, width=20)
+        self.class_entry.grid(row=1, column=0, padx=(0, 16), sticky="w")
 
-        ttk.Label(form, text="Grade %:").grid(row=0, column=2, sticky="w")
-        self.pct_entry = ttk.Entry(form, width=8)
-        self.pct_entry.grid(row=0, column=3, padx=(6, 20))
+        tk.Label(inner, text="Grade %", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=1, sticky="w", padx=(0, 16))
+        self.pct_entry = ttk.Entry(inner, width=8)
+        self.pct_entry.grid(row=1, column=1, padx=(0, 16), sticky="w")
 
-        ttk.Label(form, text="Weight:").grid(row=0, column=4, sticky="w")
+        tk.Label(inner, text="Weight", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=2, sticky="w", padx=(0, 16))
         self.weight_var = tk.StringVar(value="Regular")
-        ttk.Combobox(form, textvariable=self.weight_var, values=list(WEIGHT_BONUS.keys()), width=10, state="readonly").grid(row=0, column=5, padx=(6, 20))
+        ttk.Combobox(inner, textvariable=self.weight_var, values=list(WEIGHT_BONUS.keys()), width=10, state="readonly").grid(row=1, column=2, padx=(0, 16), sticky="w")
 
-        ttk.Button(form, text="Add Class", command=self._add_class).grid(row=0, column=6)
+        ttk.Button(inner, text="Add Class", style="Accent.TButton", command=self._add_class).grid(row=1, column=3)
 
-        self.tree = ttk.Treeview(self, columns=("class_name", "percentage", "weight", "gpa"), show="headings", height=12)
+        table_wrap = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
+        table_wrap.pack(fill="both", expand=True, padx=16)
+        self.tree = ttk.Treeview(table_wrap, columns=("class_name", "percentage", "weight", "gpa"), show="headings", height=11)
         for col, label, width in [("class_name", "Class", 220), ("percentage", "Grade %", 90), ("weight", "Weight", 100), ("gpa", "GPA Points", 100)]:
             self.tree.heading(col, text=label)
             self.tree.column(col, width=width, anchor="center" if col != "class_name" else "w")
-        self.tree.pack(fill="both", expand=True, padx=16)
+        self.tree.pack(fill="both", expand=True, padx=1, pady=1)
+        style_treeview_stripes(self.tree)
 
-        ttk.Button(self, text="Remove Selected", command=self._remove_selected).pack(pady=(10, 4))
+        ttk.Button(self, text="Remove Selected", style="Secondary.TButton", command=self._remove_selected).pack(pady=(12, 6))
 
-        self.gpa_label = tk.Label(self, text="Overall GPA: --", font=("Helvetica", 16, "bold"))
-        self.gpa_label.pack(pady=(4, 16))
+        self.gpa_card = tk.Frame(self, bg=ACCENT)
+        self.gpa_card.pack(pady=(4, 16))
+        self.gpa_label = tk.Label(self.gpa_card, text="Overall GPA: --", font=("Helvetica", 16, "bold"), bg=ACCENT, fg="white", padx=24, pady=10)
+        self.gpa_label.pack()
 
         self._refresh()
 
@@ -315,9 +370,12 @@ class GpaTab(ttk.Frame):
 
     def _refresh(self):
         self.tree.delete(*self.tree.get_children())
-        for c in self.data["gpa_classes"]:
+        for i, c in enumerate(self.data["gpa_classes"]):
             points = class_gpa(c["percentage"], c.get("weight", "Regular"))
-            self.tree.insert("", "end", values=(c["name"], c["percentage"], c.get("weight", "Regular"), f"{points:.2f}"))
+            self.tree.insert(
+                "", "end", values=(c["name"], c["percentage"], c.get("weight", "Regular"), f"{points:.2f}"),
+                tags=("odd" if i % 2 else "even",),
+            )
         gpa = overall_gpa(self.data["gpa_classes"])
         self.gpa_label.config(text=f"Overall GPA: {gpa:.2f}" if self.data["gpa_classes"] else "Overall GPA: --")
 
@@ -326,31 +384,36 @@ class PlannerTab(ttk.Frame):
     YEARS = ["Freshman", "Sophomore", "Junior", "Senior", "College Yr 1", "College Yr 2", "College Yr 3", "College Yr 4"]
 
     def __init__(self, parent, data, save_callback):
-        super().__init__(parent)
+        super().__init__(parent, style="TFrame")
         self.data = data
         self.save_callback = save_callback
 
-        form = ttk.Frame(self)
+        form = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
         form.pack(fill="x", padx=16, pady=16)
+        inner = tk.Frame(form, bg=CARD_BG)
+        inner.pack(fill="x", padx=16, pady=14)
 
-        ttk.Label(form, text="Year:").grid(row=0, column=0, sticky="w")
+        tk.Label(inner, text="Year", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=0, sticky="w", padx=(0, 16))
         self.year_var = tk.StringVar(value=self.YEARS[0])
-        ttk.Combobox(form, textvariable=self.year_var, values=self.YEARS, width=14, state="readonly").grid(row=0, column=1, padx=(6, 20))
+        ttk.Combobox(inner, textvariable=self.year_var, values=self.YEARS, width=14, state="readonly").grid(row=1, column=0, padx=(0, 16), sticky="w")
 
-        ttk.Label(form, text="Plan / Goal / Course:").grid(row=0, column=2, sticky="w")
-        self.note_entry = ttk.Entry(form, width=40)
-        self.note_entry.grid(row=0, column=3, padx=(6, 20))
+        tk.Label(inner, text="Plan / Goal / Course", font=("Helvetica", 10, "bold"), bg=CARD_BG, fg=MUTED).grid(row=0, column=1, sticky="w", padx=(0, 16))
+        self.note_entry = ttk.Entry(inner, width=42)
+        self.note_entry.grid(row=1, column=1, padx=(0, 16), sticky="w")
 
-        ttk.Button(form, text="Add", command=self._add_note).grid(row=0, column=4)
+        ttk.Button(inner, text="Add", style="Accent.TButton", command=self._add_note).grid(row=1, column=2)
 
-        self.tree = ttk.Treeview(self, columns=("year", "note"), show="headings", height=14)
+        table_wrap = tk.Frame(self, bg=CARD_BG, highlightbackground=BORDER, highlightthickness=1)
+        table_wrap.pack(fill="both", expand=True, padx=16)
+        self.tree = ttk.Treeview(table_wrap, columns=("year", "note"), show="headings", height=14)
         self.tree.heading("year", text="Year")
         self.tree.heading("note", text="Plan / Goal / Course")
         self.tree.column("year", width=120, anchor="center")
         self.tree.column("note", width=460)
-        self.tree.pack(fill="both", expand=True, padx=16)
+        self.tree.pack(fill="both", expand=True, padx=1, pady=1)
+        style_treeview_stripes(self.tree)
 
-        ttk.Button(self, text="Remove Selected", command=self._remove_selected).pack(pady=10)
+        ttk.Button(self, text="Remove Selected", style="Secondary.TButton", command=self._remove_selected).pack(pady=12)
 
         self._refresh()
 
@@ -374,8 +437,8 @@ class PlannerTab(ttk.Frame):
 
     def _refresh(self):
         self.tree.delete(*self.tree.get_children())
-        for p in self.data["plan"]:
-            self.tree.insert("", "end", values=(p["year"], p["note"]))
+        for i, p in enumerate(self.data["plan"]):
+            self.tree.insert("", "end", values=(p["year"], p["note"]), tags=("odd" if i % 2 else "even",))
 
 
 def main():
