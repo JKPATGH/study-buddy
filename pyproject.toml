@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "study-buddy"
+name = "zero-study"
 version = "0.1.0"
-description = "Turn PDFs, images, or text notes into a quick multiple-choice quiz, right from the terminal."
+description = "Zero Study: quizzes, calendar, class periods, GPA calculator, and a high school/college planner."
 requires-python = ">=3.9"
 dependencies = [
     "pdfplumber",
@@ -14,8 +14,8 @@ dependencies = [
 ]
 
 [project.scripts]
-study-buddy = "study_buddy.cli:main"
-study-buddy-gui = "study_buddy.gui:main"
+zero-study = "study_buddy.cli:main"
+zero-study-gui = "study_buddy.gui:main"
 
 [tool.setuptools]
 packages = ["study_buddy"]

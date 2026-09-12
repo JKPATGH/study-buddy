@@ -26,7 +26,7 @@ from study_buddy.theme import (
     style_treeview_stripes,
 )
 
-APP_TITLE = "Study Buddy"
+APP_TITLE = "Zero Study"
 
 
 class StudyBuddyApp(tk.Tk):
@@ -41,7 +41,7 @@ class StudyBuddyApp(tk.Tk):
 
         header = tk.Frame(self, bg=BG)
         header.pack(fill="x", padx=24, pady=(20, 8))
-        tk.Label(header, text="🦉 Study Buddy", font=FONT_TITLE, bg=BG, fg=TEXT).pack(anchor="w")
+        tk.Label(header, text="🦉 Zero Study", font=FONT_TITLE, bg=BG, fg=TEXT).pack(anchor="w")
         tk.Label(
             header, text="Your friendly study sidekick — quizzes, schedule, GPA, and your future, all in one place.",
             font=FONT_SUBTITLE, bg=BG, fg=MUTED,

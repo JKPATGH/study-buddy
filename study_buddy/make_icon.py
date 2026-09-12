@@ -1,4 +1,4 @@
-"""Generates a simple app icon (icon.icns) for the Study Buddy .app bundle."""
+"""Generates a simple app icon (icon.icns) for the Zero Study .app bundle."""
 import subprocess
 import sys
 from pathlib import Path
@@ -34,7 +34,7 @@ def draw_icon(size: int) -> Image.Image:
         font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial Bold.ttf", int(size * 0.16))
     except OSError:
         font = ImageFont.load_default()
-    text = "SB"
+    text = "ZS"
     bbox = draw.textbbox((0, 0), text, font=font)
     tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text((size / 2 - tw / 2, by + book_h + size * 0.06 - th / 2), text, fill=(255, 255, 255, 255), font=font)

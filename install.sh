@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# One-command installer for the study-buddy CLI app.
+# One-command installer for the Zero Study CLI + desktop app.
 # Usage (local):  bash install.sh
-# Usage (remote): curl -fsSL https://raw.githubusercontent.com/JKPATGH/study-buddy/main/install.sh | bash
+# Usage (remote): curl -fsSL https://raw.githubusercontent.com/JKPATGH/zero-study/main/install.sh | bash
 set -euo pipefail
 
-echo "Installing study-buddy..."
+echo "Installing Zero Study..."
 
-REPO_URL="https://github.com/JKPATGH/study-buddy.git"
+REPO_URL="https://github.com/JKPATGH/zero-study.git"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || true)"
 
 if ! command -v brew >/dev/null 2>&1; then
@@ -25,7 +25,7 @@ if ! command -v pipx >/dev/null 2>&1; then
   pipx ensurepath
 fi
 
-echo "Installing study-buddy app..."
+echo "Installing Zero Study app..."
 if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/pyproject.toml" ]]; then
   pipx install "$SCRIPT_DIR" --force
 else
@@ -33,13 +33,13 @@ else
 fi
 
 echo "Installing python-tk (needed for the desktop app window)..."
-if ! "$(pipx environment --value PIPX_LOCAL_VENVS 2>/dev/null || echo "$HOME/Library/Application Support/pipx/venvs")/study-buddy/bin/python3" -c "import tkinter" >/dev/null 2>&1; then
+if ! "$(pipx environment --value PIPX_LOCAL_VENVS 2>/dev/null || echo "$HOME/Library/Application Support/pipx/venvs")/zero-study/bin/python3" -c "import tkinter" >/dev/null 2>&1; then
   brew install python-tk@3.14 2>/dev/null || brew install python-tk
 fi
 
-echo "Creating the Study Buddy desktop app..."
-VENV_BIN="$HOME/Library/Application Support/pipx/venvs/study-buddy/bin"
-APP_DIR="$HOME/Applications/Study Buddy.app"
+echo "Creating the Zero Study desktop app..."
+VENV_BIN="$HOME/Library/Application Support/pipx/venvs/zero-study/bin"
+APP_DIR="$HOME/Applications/Zero Study.app"
 mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 
 if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/study_buddy/icon.icns" ]]; then
@@ -58,17 +58,17 @@ cat > "$APP_DIR/Contents/Info.plist" << PLIST
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>Study Buddy</string>
+    <string>Zero Study</string>
     <key>CFBundleDisplayName</key>
-    <string>Study Buddy</string>
+    <string>Zero Study</string>
     <key>CFBundleIdentifier</key>
-    <string>com.studybuddy.app</string>
+    <string>com.zerostudy.app</string>
     <key>CFBundleVersion</key>
     <string>0.1.0</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleExecutable</key>
-    <string>StudyBuddyLauncher</string>
+    <string>ZeroStudyLauncher</string>
     <key>CFBundleIconFile</key>
     <string>icon.icns</string>
     <key>LSMinimumSystemVersion</key>
@@ -79,13 +79,13 @@ cat > "$APP_DIR/Contents/Info.plist" << PLIST
 </plist>
 PLIST
 
-cat > "$APP_DIR/Contents/MacOS/StudyBuddyLauncher" << LAUNCHER
+cat > "$APP_DIR/Contents/MacOS/ZeroStudyLauncher" << LAUNCHER
 #!/usr/bin/env bash
-exec "$VENV_BIN/study-buddy-gui"
+exec "$VENV_BIN/zero-study-gui"
 LAUNCHER
-chmod +x "$APP_DIR/Contents/MacOS/StudyBuddyLauncher"
+chmod +x "$APP_DIR/Contents/MacOS/ZeroStudyLauncher"
 
 echo ""
 echo "Done!"
-echo "- Terminal command: study-buddy <file> -n 5"
-echo "- Desktop app: open ~/Applications, double-click 'Study Buddy'"
+echo "- Terminal command: zero-study <file> -n 5"
+echo "- Desktop app: open ~/Applications, double-click 'Zero Study'"

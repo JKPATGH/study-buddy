@@ -1,4 +1,4 @@
-"""Simple JSON-backed local storage for Study Buddy app data (calendar, periods, GPA, planner)."""
+"""Simple JSON-backed local storage for Zero Study app data (calendar, periods, GPA, planner)."""
 import json
 from pathlib import Path
 

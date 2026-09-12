@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Study Buddy CLI: upload a PDF, image, or text file and get quizzed on it."""
+"""Zero Study CLI: upload a PDF, image, or text file and get quizzed on it."""
 import argparse
 import string
 import sys

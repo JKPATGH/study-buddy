@@ -1,4 +1,4 @@
-"""Shared visual theme for the Study Buddy desktop app."""
+"""Shared visual theme for the Zero Study desktop app."""
 import tkinter as tk
 from tkinter import ttk
 
