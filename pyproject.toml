@@ -19,3 +19,6 @@ study-buddy-gui = "study_buddy.gui:main"
 
 [tool.setuptools]
 packages = ["study_buddy"]
+
+[tool.setuptools.package-data]
+study_buddy = ["icon.icns"]

@@ -40,7 +40,17 @@ fi
 echo "Creating the Study Buddy desktop app..."
 VENV_BIN="$HOME/Library/Application Support/pipx/venvs/study-buddy/bin"
 APP_DIR="$HOME/Applications/Study Buddy.app"
-mkdir -p "$APP_DIR/Contents/MacOS"
+mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
+
+if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/study_buddy/icon.icns" ]]; then
+  cp "$SCRIPT_DIR/study_buddy/icon.icns" "$APP_DIR/Contents/Resources/icon.icns"
+else
+  "$VENV_BIN/python3" - << 'ICONPY'
+from study_buddy.make_icon import main
+main()
+ICONPY
+  cp "$("$VENV_BIN/python3" -c "import study_buddy, os; print(os.path.join(os.path.dirname(study_buddy.__file__), 'icon.icns'))")" "$APP_DIR/Contents/Resources/icon.icns" 2>/dev/null || true
+fi
 
 cat > "$APP_DIR/Contents/Info.plist" << PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -59,6 +69,8 @@ cat > "$APP_DIR/Contents/Info.plist" << PLIST
     <string>APPL</string>
     <key>CFBundleExecutable</key>
     <string>StudyBuddyLauncher</string>
+    <key>CFBundleIconFile</key>
+    <string>icon.icns</string>
     <key>LSMinimumSystemVersion</key>
     <string>11.0</string>
     <key>NSHighResolutionCapable</key>
