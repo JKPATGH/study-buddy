@@ -15,6 +15,7 @@ dependencies = [
 
 [project.scripts]
 study-buddy = "study_buddy.cli:main"
+study-buddy-gui = "study_buddy.gui:main"
 
 [tool.setuptools]
 packages = ["study_buddy"]
