@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "study-buddy"
+version = "0.1.0"
+description = "Turn PDFs, images, or text notes into a quick multiple-choice quiz, right from the terminal."
+requires-python = ">=3.9"
+dependencies = [
+    "pdfplumber",
+    "pytesseract",
+    "Pillow",
+]
+
+[project.scripts]
+study-buddy = "study_buddy.cli:main"
+
+[tool.setuptools]
+packages = ["study_buddy"]
