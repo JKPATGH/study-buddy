@@ -41,9 +41,9 @@ class StudyBuddyApp(tk.Tk):
 
         header = tk.Frame(self, bg=BG)
         header.pack(fill="x", padx=24, pady=(20, 8))
-        tk.Label(header, text="🎓 Study Buddy", font=FONT_TITLE, bg=BG, fg=TEXT).pack(anchor="w")
+        tk.Label(header, text="🦉 Study Buddy", font=FONT_TITLE, bg=BG, fg=TEXT).pack(anchor="w")
         tk.Label(
-            header, text="Quiz yourself, track your schedule, and plan your future.",
+            header, text="Your friendly study sidekick — quizzes, schedule, GPA, and your future, all in one place.",
             font=FONT_SUBTITLE, bg=BG, fg=MUTED,
         ).pack(anchor="w", pady=(2, 0))
 

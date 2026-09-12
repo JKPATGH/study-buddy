@@ -2,18 +2,18 @@
 import tkinter as tk
 from tkinter import ttk
 
-BG = "#F4F5FB"
+BG = "#FBF6EE"
 CARD_BG = "#FFFFFF"
-ACCENT = "#6C63FF"
-ACCENT_DARK = "#554FCC"
-TEXT = "#1F1F2E"
-MUTED = "#6B6B80"
-BORDER = "#E1E2F0"
-ROW_ALT = "#F0EFFC"
+ACCENT = "#FF7A45"
+ACCENT_DARK = "#E85F2A"
+TEXT = "#2B2418"
+MUTED = "#8A7F6D"
+BORDER = "#F0E4D2"
+ROW_ALT = "#FDF1E2"
 
-FONT_TITLE = ("Helvetica", 20, "bold")
-FONT_SUBTITLE = ("Helvetica", 12)
-FONT_HEADING = ("Helvetica", 13, "bold")
+FONT_TITLE = ("Helvetica", 24, "bold")
+FONT_SUBTITLE = ("Helvetica", 13)
+FONT_HEADING = ("Helvetica", 14, "bold")
 FONT_BODY = ("Helvetica", 12)
 FONT_BUTTON = ("Helvetica", 12, "bold")
 
